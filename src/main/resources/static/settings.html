@@ -33,7 +33,7 @@
         <div class="flex items-center space-x-3">
             <!-- Status Badge -->
             <div class="status-badge">
-                <div class="w-2 h-2 rounded-full connection-indicator" id="ws-indicator"></div>
+                <div class="w-2 h-2 rounded-full connection-indicator" id="mqtt-indicator"></div>
                 <span class="ws-status-text" id="ws-status">MQTT</span>
                 <span class="mqtt-status-text" id="status">Belum terhubung</span>
             </div>
@@ -85,7 +85,6 @@
                 </div>
                 <div class="form-actions">
                     <button type="button" id="btn-connect" disabled class="btn-primary">Connect</button>
-                    <button type="button" id="btn-disconnect" class="btn-danger-outline" disabled>Disconnect</button>
                 </div>
             </form>
       
@@ -113,7 +112,6 @@
                 </div>
                 <div class="form-actions">
                     <button type="button" id="btn-subscribe" class="btn-primary" disabled aria-describedby="subscription-help">Subscribe</button>
-                    <button type="button" id="btn-unsubscribe" class="btn-danger-outline" disabled>Unsubscribe</button>
                 </div>
             </form>
             <p id="subscription-help" class="form-help">Hubungkan broker sebelum memilih topic untuk berlangganan.</p>

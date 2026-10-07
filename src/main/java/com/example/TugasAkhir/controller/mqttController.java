@@ -1,32 +1,27 @@
 package com.example.TugasAkhir.controller;
 
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-
-import javax.net.ssl.SSLException;
 
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.TugasAkhir.service.subscriberService;
+import com.example.TugasAkhir.service.PesanErrorMqtt;
+import com.example.TugasAkhir.mqtt.MqttClientManager;
 
 @RestController
 @RequestMapping("/api/mqtt")
 public class mqttController {
 
-    private final subscriberService service;
+    private final MqttClientManager service;
 
     // Spring memberikan objek service kepada controller.
-    public mqttController(subscriberService service) {
+    public mqttController(MqttClientManager service) {
         this.service = service;
     }
 
@@ -36,12 +31,9 @@ public class mqttController {
             @RequestParam("host") String host,
             @RequestParam("port") int port,
             @RequestParam("clientId") String clientId,
-            @RequestParam(value = "username", required = false)
-            String username,
-            @RequestParam(value = "password", required = false)
-            String password,
-            @RequestParam("tls") boolean tls
-    ) {
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value = "password", required = false) String password,
+            @RequestParam("tls") boolean tls) {
 
         try {
             // Periksa input juga di Java sebelum menghubungi broker.
@@ -79,79 +71,40 @@ public class mqttController {
                     clientId,
                     username,
                     password,
-                    tls
-            );
+                    tls);
 
             // Kirim jawaban berhasil ke JavaScript.
             return ResponseEntity.ok(
-                    "Berhasil terhubung ke broker"
-            );
+                    "Berhasil terhubung ke broker");
 
         } catch (MqttException error) {
-            return ResponseEntity.status(502).body(pesanErrorKoneksi(error));
-        } catch (URISyntaxException | IllegalArgumentException error) {
+            // Paho memberi tahu connect gagal. Kirim penjelasannya ke halaman web.
+            return ResponseEntity.status(502).body("Gagal connect. " + PesanErrorMqtt.dariException(error));
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity.badRequest().body(error.getMessage());
+        } catch (URISyntaxException error) {
             return ResponseEntity.badRequest().body("Konfigurasi tidak valid. Periksa format host dan Client ID.");
         }
     }
 
-    private String pesanErrorKoneksi(MqttException error) {
-        // Error Paho bisa membungkus error lain, misalnya nama broker tidak ditemukan.
-        Throwable penyebab = error;
-        // Baca penyebabnya satu per satu sampai ditemukan pesan yang sesuai.
-        while (penyebab != null) {
-            if (penyebab instanceof UnknownHostException) {
-                return "Nama broker tidak dapat ditemukan. Periksa ejaan host, koneksi internet, atau DNS.";
-            }
-            if (penyebab instanceof SSLException) {
-                return "Koneksi TLS gagal. Periksa port TLS dan sertifikat broker.";
-            }
-            if (penyebab instanceof ConnectException) {
-                return "Koneksi ke broker ditolak atau tidak dapat dibuat. Periksa host, port, layanan broker, dan jaringan.";
-            }
-            if (penyebab instanceof SocketTimeoutException) {
-                return "Broker tidak merespons tepat waktu. Periksa host, port, dan jaringan.";
-            }
-            penyebab = penyebab.getCause();
-        }
-        if (error.getReasonCode() == 138) {
-            return "Koneksi ditolak broker: Client ID atau IP Anda diblokir (kode 138 / Banned). Coba ganti Client ID menjadi nama unik (misal: " + "client-" + System.currentTimeMillis() + ") dan kosongkan username/password untuk broker publik.";
-        }
-        if (error.getReasonCode() == 134 || error.getReasonCode() == 135) {
-            return "Koneksi ditolak broker: Autentikasi/Otorisasi gagal (kode " + error.getReasonCode() + "). Periksa username dan password Anda.";
-        }
-
-        return "Koneksi MQTT gagal (kode " + error.getReasonCode()
-                + "). Periksa port, username/password, izin akun, dan pilihan TLS.";
-    }
-
-    @ExceptionHandler({org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
-            org.springframework.web.bind.MissingServletRequestParameterException.class})
-    public ResponseEntity<String> inputTidakValid() {
-        return ResponseEntity.badRequest().body("Lengkapi field wajib. Port harus angka bulat 1–65535 dan keamanan koneksi harus dipilih.");
-    }
-
-
     @PostMapping("/disconnect")
-public ResponseEntity<String> disconnect() {
+    public ResponseEntity<String> disconnect() {
 
-    try {
-        // Minta service memutus koneksi.
-        service.putusKoneksi();
+        try {
+            // Minta service memutus koneksi.
+            service.putusKoneksi();
 
-        return ResponseEntity.ok("Koneksi berhasil diputus");
+            return ResponseEntity.ok("Koneksi berhasil diputus");
 
-    } catch (MqttException error) {
-        return ResponseEntity.status(500).body(
-                "Gagal memutus koneksi"
-        );
+        } catch (MqttException error) {
+            // Paho memberi tahu disconnect gagal. Tampilkan pesan untuk pengguna.
+            return ResponseEntity.status(500).body(
+                    "Gagal disconnect. " + PesanErrorMqtt.dariException(error));
+        }
+    }
+
+    @GetMapping("/status")
+    public boolean status() {
+        return service.cekKoneksi();
     }
 }
-
-
-@GetMapping("/status")
-public boolean status() {
-    return service.cekKoneksi();
-}
-}
-
-

@@ -1,6 +1,7 @@
 package com.example.TugasAkhir.controller;
 
-import com.example.TugasAkhir.service.subscriberService;
+import com.example.TugasAkhir.mqtt.MqttClientManager;
+import com.example.TugasAkhir.service.PesanErrorMqtt;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,14 +10,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/mqtt")
 public class subscribeController {
 
-    private final subscriberService service;
+    private final MqttClientManager service;
 
-    public subscribeController(subscriberService service) {
+    public subscribeController(MqttClientManager service) {
         this.service = service;
     }
 
     @GetMapping("/subscription-status")
-    public subscriberService.StatusSubscription statusSubscription() {
+    public MqttClientManager.StatusSubscription statusSubscription() {
         return service.statusSubscription();
     }
 
@@ -43,8 +44,9 @@ public class subscribeController {
             );
 
         } catch (MqttException error) {
+            // Tangkap kegagalan subscribe yang dilaporkan library Paho.
             return ResponseEntity.status(502).body(
-                    "Gagal subscribe. Periksa koneksi dan izin topic."
+                    "Gagal subscribe. " + PesanErrorMqtt.dariException(error)
             );
         }
     }
@@ -59,7 +61,8 @@ public class subscribeController {
         } catch (IllegalArgumentException error) {
             return ResponseEntity.badRequest().body(error.getMessage());
         } catch (MqttException error) {
-            return ResponseEntity.status(502).body("Gagal unsubscribe. Periksa koneksi broker.");
+            // Tangkap kegagalan unsubscribe yang dilaporkan library Paho.
+            return ResponseEntity.status(502).body("Gagal unsubscribe. " + PesanErrorMqtt.dariException(error));
         }
     }
 }

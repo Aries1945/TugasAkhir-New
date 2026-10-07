@@ -34,8 +34,8 @@
         <div class="flex items-center space-x-3">
             <!-- Status Badge -->
             <div class="status-badge">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" id="ws-indicator"></div>
-                <span class="ws-status-text" id="ws-status">Connecting</span>
+                <div class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" id="mqtt-indicator"></div>
+                <span class="ws-status-text">MQTT</span>
                 <span class="mqtt-status-text" id="mqtt-status">Memuat...</span>
             </div>
             
@@ -46,23 +46,24 @@
         <!-- Header & Search -->
         <div class="history-header">
             <div>
-                <h1 class="hero-title">Sensors</h1>
+                <h1 class="hero-title">Riwayat Suhu</h1>
+                <p class="hero-desc">Pilih sensor untuk melihat seluruh catatan suhu dan waktu diterima.</p>
+                <p class="hero-desc">Riwayat disimpan di database dan tetap tersedia setelah aplikasi dimulai ulang.</p>
             </div>
           </div>
 
+        <!-- Pesan kosong atau kesalahan ditampilkan tanpa menghapus data terakhir. -->
+        <p id="history-info" class="hero-desc" role="status">Memuat riwayat...</p>
         <!-- Sensor List Container -->
         <div id="sensor-list-container" class="grid grid-cols-1 md-grid-cols-3 gap-6 mb-6">
             <!-- Rendered by JS -->
         </div>
 
-        <!-- Pagination -->
-        <div id="pagination-wrapper" class="mb-8"></div>
-
         <!-- Detail Table Section -->
-        <div id="detail-section" class="glass mb-12" style="padding: 0; overflow: hidden;">
+        <div id="detail-section" class="glass mb-12" style="padding: 0; overflow: hidden;" hidden>
             <div class="detail-header">
                 <h2 id="detail-title">Riwayat Detail</h2>
-                <button id="close-detail" class="icon-btn">
+                <button id="close-detail" class="icon-btn" type="button" aria-label="Tutup riwayat sensor">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -72,10 +73,10 @@
                 <div class="detail-chart-card">
                     <div class="detail-chart-title">
                         <h3>Grafik Tren Suhu</h3>
-                        <p>Menampilkan fluktuasi data suhu terbaru yang terekam.</p>
+                        <p id="chart-info">Menampilkan seluruh catatan sensor yang dipilih.</p>
                     </div>
                     <div class="detail-chart-container">
-                        <canvas id="detail-chart"></canvas>
+                        <canvas id="detail-chart" role="img" aria-label="Grafik riwayat suhu sensor"></canvas>
                     </div>
                 </div>
 
@@ -99,13 +100,17 @@
 
     </main>
 
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
+    <!-- JavaScript menyalin kartu ini untuk setiap topic yang memiliki data. -->
+    <template id="history-sensor-template">
+        <button type="button" class="gradient-card history-sensor">
+            <span class="card-title"></span>
+            <span class="history-count"></span>
+            <span>Lihat riwayat →</span>
+        </button>
+    </template>
 
     <!-- Dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     
     <!-- App Logic -->
     <script src="js/history.js"></script>
