@@ -1,0 +1,389 @@
+/* Dashboard Two-Column Grid Layout */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar Hero Layout */
+.sidebar-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--gradient-hero-start);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px -10px var(--shadow-color), 0 0 25px -10px var(--shadow-glow-color);
+  padding: 32px;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-hero {
+    position: sticky;
+    top: 110px; /* Offset below sticky nav */
+    max-height: calc(100vh - 150px);
+  }
+}
+
+.sidebar-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 10;
+  position: relative;
+}
+
+.sidebar-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  width: 100%;
+  box-sizing: border-box;
+  transition: background 0.3s ease;
+}
+
+.logo-unpar {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-if {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.sidebar-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #0284c7;
+}
+
+.hero-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.hero-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Sensor Cards */
+.gradient-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 25px -10px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  /* Kartu tetap diam dan tampil sama saat kursor berada di atasnya. */
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  z-index: 10;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.card-badge {
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--border-color);
+  background-color: #f1f5f9;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+/* Card Badge Status Colors */
+.card-badge.status-normal {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+.card-badge.status-cold {
+  background-color: rgba(14, 165, 233, 0.1);
+  color: #0ea5e9;
+  border-color: rgba(14, 165, 233, 0.2);
+}
+.card-badge.status-warm {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+.card-badge.status-hot {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Custom SVG Gauge Styles */
+.gauge-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 128px;
+  margin: 12px 0;
+  z-index: 10;
+}
+
+.gauge-svg {
+  width: 112px;
+  height: 112px;
+}
+
+.gauge-track-path {
+  stroke: var(--gauge-track);
+  stroke-width: 8;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke 0.3s ease;
+}
+
+.gauge-value-path {
+  stroke-width: 8;
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 188.5; /* 3/4 circle perimeter with R=40 */
+  stroke-dashoffset: 188.5;
+  /* Gerakan indikator singkat dan halus, mengikuti pembaruan data. */
+  transition: stroke-dashoffset 0.2s ease;
+}
+
+.gauge-center-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.gauge-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.gauge-unit {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Sparkline Trend Chart */
+.sparkline-box {
+  height: 40px;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 8px;
+  z-index: 10;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  z-index: 10;
+}
+
+.card-glow {
+  position: absolute;
+  bottom: -64px;
+  right: -64px;
+  width: 144px;
+  height: 144px;
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: 0.1;
+  pointer-events: none;
+  transition: background-color 0.5s ease;
+}
+
+/* Live Stream Section */
+.stream-header {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .stream-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.stream-title h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stream-title p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.interval-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background-color: var(--border-color);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.chart-container {
+  height: 300px;
+  width: 100%;
+}
+
+.custom-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  gap: 8px 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  max-height: 80px;
+  overflow-y: auto;
+  width: 100%;
+  padding: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.legend-color {
+  width: 12px;
+  height: 4px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+
+/* Custom Chart tooltip adjustments */
+.chartjs-tooltip {
+  background: var(--toast-bg) !important;
+  border: 1px solid var(--toast-border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+
+.dashboard-intro { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.dashboard-intro h1 { font-size: 24px; margin: 4px 0 8px; }
+.dashboard-eyebrow { color: #0284c7; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+#dashboard-info, #chart-info { font-size: 12px; color: var(--text-muted); }
+.configure-link { padding: 10px 16px; background: #e0f2fe; border-radius: 10px; color: #0369a1; font-size: 12px; white-space: nowrap; }
+.empty-state { margin-bottom: 24px; padding: 32px; text-align: center; font-size: 14px; }
+#sensor-cards-container { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.card-title { overflow-wrap: anywhere; }
+.gauge-value { color: var(--sensor-color); }
+.gauge-value-path, .sparkline { stroke: var(--sensor-color); }
+.gauge-scale { text-align: center; font-size: 9px; color: var(--text-muted); margin-bottom: 12px; }
+.sparkline-box svg { width: 100%; height: 40px; }
+.card-footer { gap: 12px; }
+#chart-info { margin-top: 12px; }
+@media (max-width: 600px) { .dashboard-intro { align-items: flex-start; flex-direction: column; } }
+
+
+/* Kartu mengikuti TA-tes: gauge di tengah, sparkline, dan cahaya lembut. */
+#sensor-cards-container { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gradient-card { min-height: 256px; }
+.gradient-card .gauge-value { font-size: 28px; }
+.gradient-card .sparkline-box { height: 40px; margin-top: auto; }
+.gradient-card .card-glow { background: var(--sensor-color); }
+.sensor-pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: -6px 0 24px; font-size: 12px; color: var(--text-muted); }
+.sensor-pagination[hidden] { display: none; }
+.sensor-pagination button { border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; background: white; color: #0284c7; cursor: pointer; }
+.sensor-pagination button:disabled { opacity: .4; cursor: not-allowed; }
+#chart-error { color: #b91c1c; font-size: 12px; }
+@media (max-width: 900px) { #sensor-cards-container { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 580px) { #sensor-cards-container { grid-template-columns: 1fr; } .status-badge { flex-wrap: wrap; } }
+
+/* Tampilan sederhana sesuai contoh: topic kecil dan gauge di tengah. */
+.gradient-card {
+  min-height: 256px;
+  padding: 24px;
+}
+.gradient-card .card-title { font-size: 12px; }
+
+/* Grafik kecil berada di kanan bawah, diikuti waktu data terakhir. */
+.gradient-card .sparkline-box {
+  width: 72px;
+  height: 32px;
+  align-self: flex-end;
+  margin-top: auto;
+}
+.gradient-card .sparkline-box svg { height: 32px; }
+.sensor-freshness { color: var(--text-muted); }
+.sensor-time { white-space: nowrap; }
+
+/* Hormati pengguna yang memilih tampilan tanpa animasi. */
+@media (prefers-reduced-motion: reduce) {
+  .gauge-value-path { transition: none; }
+}

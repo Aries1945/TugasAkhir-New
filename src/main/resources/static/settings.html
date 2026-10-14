@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pengaturan koneksi dan subscription MQTT">
+    <title>Settings - Tugas Akhir</title>
+
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="glass-nav">
+        <div class="logo-container">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <img src="assets/LogoUnpar.png" alt="Unpar" class="nav-logo-img">
+                    <img src="assets/LogoIF2.png" alt="IF" class="nav-logo-img">
+                </div>
+            </div>
+            
+            <!-- Links -->
+            <div class="nav-links ml-8">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="settings.html" class="nav-link active">Configure</a>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <!-- Status Badge -->
+            <div class="status-badge">
+                <div class="w-2 h-2 rounded-full connection-indicator" id="mqtt-indicator"></div>
+                <span class="ws-status-text" id="ws-status">MQTT</span>
+                <span class="mqtt-status-text" id="status">Belum terhubung</span>
+            </div>
+            
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="page-heading"><h1>Configure MQTT</h1></header>
+        <!-- Connection Settings Section -->
+        <div class="glass mb-8">
+            <div class="config-section-title">
+             
+                <div class="config-title-text">
+                    <h2>1. Koneksi Broker</h2>
+    
+                </div>
+            </div>
+            
+            <form id="mqtt-config-form" class="mqtt-form">
+                <div class="form-group">
+                    <label for="host" class="form-label">Broker Host <span style="color:#e21c1c">*</span></label>
+                    <input type="text" id="host" disabled placeholder="Contoh: broker.emqx.io atau localhost" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="port" class="form-label">Port <span style="color:#e21c1c">*</span></label>
+                    <input type="number" id="port" disabled min="1" max="65535" placeholder="-"  required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="clientId" class="form-label">Client ID <span style="color:#e21c1c">*</span></label>
+                    <input type="text" id="clientId" disabled placeholder="Contoh: web-subscriber-01" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="username" class="form-label">Username (opsional)</label>
+                    <input type="text" id="username" disabled autocomplete="username" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password (opsional)</label>
+                    <input type="password" id="password" disabled autocomplete="current-password" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="tls" class="form-label">Keamanan koneksi <span style="color:#ef4444">*</span></label>
+                    <select id="tls" disabled required class="form-select">
+                        <option value="">Pilih keamanan koneksi</option>
+                        <option value="false">Tanpa TLS</option>
+                        <option value="true">Gunakan TLS</option>
+                    </select>
+                    <p class="form-help">Port umumnya 1883 untuk Tanpa TLS dan 8883 untuk TLS/SSL. Broker dapat memakai port lain.</p>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="btn-connect" disabled class="btn-primary">Connect</button>
+                </div>
+            </form>
+      
+        </div>
+
+        <section class="glass mb-8" aria-labelledby="subscription-title">
+            <div class="config-section-title">
+                <div class="config-title-text">
+                    <h2 id="subscription-title">2. Subscription</h2>
+                </div>
+            </div>
+            <form id="mqtt-subscription-form" class="mqtt-form">
+                <div class="form-group">
+                    <label for="mqtt-topic" class="form-label">Topic <span style="color:#ef4444">*</span></label>
+                    <input type="text" id="mqtt-topic" placeholder="Contoh: sensor/suhu/#" required class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="mqtt-qos" class="form-label">QoS Level</label>
+                    <select id="mqtt-qos" class="form-select" style="appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%2394a3b8%22><path fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px 16px;">
+                        <option value="0">QoS 0</option>
+                        <option value="1" selected>QoS 1</option>
+                        <option value="2">QoS 2</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="btn-subscribe" class="btn-primary" disabled aria-describedby="subscription-help">Subscribe</button>
+                </div>
+            </form>
+            <p id="subscription-help" class="form-help">Hubungkan broker sebelum memilih topic untuk berlangganan.</p>
+        </section>
+    </main>
+
+    <script src="js/settings.js"></script>
+    <script src="js/subscribe.js"></script>
+</body>
+</html>

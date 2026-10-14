@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ThermoStream - MQTT Live Dashboard">
-    <title>ThermoStream - Dashboard</title>
-    <!-- Prevent theme flash and theme toggle management -->
-    <script src="js/theme.js"></script>
-    <!-- Custom Styles -->
+    <title>Dashboard - Tugas Akhir</title>
+
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
@@ -28,110 +26,78 @@
             <div class="nav-links ml-8">
                 <a href="dashboard.html" class="nav-link active">Dashboard</a>
                 <a href="history.html" class="nav-link">History</a>
+                <a href="settings.html" class="nav-link">Configure</a>
             </div>
         </div>
         
         <div class="flex items-center space-x-3">
             <!-- Status Badge -->
             <div class="status-badge">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" id="ws-indicator"></div>
-                <span class="ws-status-text" id="ws-status">Connecting</span>
+                <div class="w-2 h-2 rounded-full" id="mqtt-indicator"></div>
+                <span class="ws-status-text">MQTT</span>
                 <span class="mqtt-status-text" id="mqtt-status">Memuat...</span>
             </div>
             
-            <!-- Theme Toggle -->
-            <button id="theme-toggle" class="icon-btn" aria-label="Toggle theme">
-                <!-- Sun icon -->
-                <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <!-- Moon icon -->
-                <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-            </button>
         </div>
     </nav>
 
     <main class="container">
-        <!-- Connection Settings Section -->
-        <div class="glass mb-8">
-            <div class="config-section-title">
-                <div class="config-icon-box">
-                    <svg class="w-4.5 h-4.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                </div>
-                <div class="config-title-text">
-                    <h2>MQTT Configuration</h2>
-                    <p>Konfigurasi alamat broker, port, dan topik subscribe secara dinamis.</p>
-                </div>
+        <section class="glass dashboard-intro">
+            <div>
+                <p class="dashboard-eyebrow">MONITORING MQTT</p>
+                <h1>Suhu sensor</h1>
+                <p id="dashboard-info" role="status">Mengambil data dari aplikasi...</p>
             </div>
-            
-            <form id="mqtt-config-form">
-                <div class="form-group">
-                    <label class="form-label">Broker Host <span style="color:#ef4444">*</span></label>
-                    <input type="text" id="mqtt-host" placeholder="Contoh: broker.emqx.io atau localhost" required class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Port <span style="color:#ef4444">*</span></label>
-                    <input type="number" id="mqtt-port" placeholder="1883" value="1883" required class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Client ID <span style="color:#ef4444">*</span></label>
-                    <input type="text" id="mqtt-client-id" placeholder="Contoh: web-subscriber-01" required class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Topic <span style="color:#ef4444">*</span></label>
-                    <input type="text" id="mqtt-topic" placeholder="Contoh: sensor/suhu/#" required class="form-input">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">QoS Level</label>
-                    <select id="mqtt-qos" class="form-select" style="appearance: none; background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%2394a3b8%22><path fill-rule=%22evenodd%22 d=%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule=%22evenodd%22/></svg>'); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px 16px;">
-                        <option value="0">QoS 0</option>
-                        <option value="1" selected>QoS 1</option>
-                        <option value="2">QoS 2</option>
-                    </select>
-                </div>
-                <div class="flex space-x-2">
-                    <button type="submit" id="btn-connect" class="btn-primary flex-1">Connect</button>
-                    <button type="button" id="btn-disconnect" class="btn-danger-outline hidden">Disconnect</button>
-                </div>
-            </form>
-        </div>
-
+            <a href="settings.html" class="configure-link">Atur koneksi &amp; topic →</a>
+        </section>
+        <p id="dashboard-empty" class="glass empty-state">Belum ada data suhu. Hubungkan broker, subscribe, lalu jalankan publisher.</p>
         <!-- Sensor Cards Grid -->
         <div id="sensor-cards-container" class="grid grid-cols-1 md-grid-cols-3 gap-6 mb-6">
-            <!-- Rendered by JS dynamically based on active sensors -->
+            <!-- Kartu diisi dari template HTML di bawah. -->
         </div>
-
-        <!-- Pagination -->
-        <div id="dash-pagination-wrapper" class="mb-8"></div>
 
         <!-- Live Stream Chart -->
         <div class="glass mb-8">
             <div class="stream-header">
                 <div class="stream-title">
-                    <h2>Live Stream</h2>
-                    <p>Pembaruan suhu real-time — 60 titik terakhir</p>
+                    <h2>Grafik suhu</h2>
+                    <p>Seluruh pembacaan sejak koneksi dimulai · waktu diterima server</p>
                 </div>
-                <div>
-                    <span class="interval-badge">Interval: 2s</span>
-                </div>
+                <span class="interval-badge">Jeda pembaruan: 250 ms</span>
             </div>
             
             <div class="chart-container">
-                <canvas id="mainChart"></canvas>
+                <canvas id="mainChart" role="img" aria-label="Grafik seluruh pembacaan suhu yang tersimpan"></canvas>
             </div>
             
             <!-- Custom Legend -->
-            <div class="custom-legend">
-                <!-- Rendered dynamically by JS -->
-            </div>
+            <p id="chart-info" class="form-help" role="status"></p>
         </div>
     </main>
 
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
+    <!-- Bentuk kartu ditulis di HTML; JavaScript hanya menyalin dan mengisinya. -->
+    <template id="sensor-template">
+        <article class="gradient-card">
+            <!-- Kartu sederhana: topic, suhu, grafik kecil, dan waktu terakhir. -->
+            <div class="card-header"><h2 class="card-title"></h2></div>
+            <div class="gauge-container" title="Skala indikator 0–50 °C">
+                <svg class="gauge-svg" viewBox="0 0 110 110" aria-hidden="true">
+                    <path class="gauge-track-path" d="M 26.7 83.3 A 40 40 0 1 1 83.3 83.3" />
+                    <path class="gauge-value-path" d="M 26.7 83.3 A 40 40 0 1 1 83.3 83.3" />
+                </svg>
+                <div class="gauge-center-text"><span class="gauge-value">—</span><span class="gauge-unit">°C</span></div>
+            </div>
+            <div class="sparkline-box">
+                <svg viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                    <polyline class="sparkline" fill="none" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="card-footer"><span class="sensor-freshness"></span><time class="sensor-time" title="Waktu data terakhir"></time></div>
+            <div class="card-glow" aria-hidden="true"></div>
+        </article>
+    </template>
 
     <!-- Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     
     <!-- App Logic -->

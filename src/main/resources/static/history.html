@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ThermoStream - Sensor History">
+    <title>ThermoStream - History</title>
+    <!-- Prevent theme flash and theme toggle management -->
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/history.css">
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="glass-nav">
+        <div class="logo-container">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2">
+                    <img src="assets/LogoUnpar.png" alt="Unpar" class="nav-logo-img">
+                    <img src="assets/LogoIF2.png" alt="IF" class="nav-logo-img">
+                </div>
+            </div>
+            
+            <!-- Links -->
+            <div class="nav-links ml-8">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="history.html" class="nav-link active">History</a>
+                <a href="settings.html" class="nav-link">Configure</a>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <!-- Status Badge -->
+            <div class="status-badge">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot" id="mqtt-indicator"></div>
+                <span class="ws-status-text">MQTT</span>
+                <span class="mqtt-status-text" id="mqtt-status">Memuat...</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Header & Search -->
+        <div class="history-header">
+            <div>
+                <h1 class="hero-title">Sensors</h1>
+                <p class="hero-desc" id="sensor-count-summary">Memuat riwayat sensor...</p>
+            </div>
+            
+            <div class="search-wrapper">
+                <div class="search-icon">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <input type="text" id="search-input" placeholder="Cari sensor..." class="search-input">
+            </div>
+        </div>
+
+        <!-- Sensor List Container -->
+        <div id="sensor-list-container" class="grid grid-cols-1 md-grid-cols-3 gap-6 mb-6">
+            <!-- Rendered by JS -->
+        </div>
+
+        <!-- Detail Table Section -->
+        <div id="detail-section" class="glass hidden mb-12" style="padding: 0; overflow: hidden;">
+            <div class="detail-header">
+                <h2 id="detail-title">Riwayat Detail</h2>
+                <button id="close-detail" class="icon-btn">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="detail-grid">
+                <!-- Left: Historical Chart Card -->
+                <div class="detail-chart-card">
+                    <div class="detail-chart-title">
+                        <h3>Grafik Tren Suhu</h3>
+                        <p>Menampilkan fluktuasi data suhu terbaru yang terekam.</p>
+                    </div>
+                    <div class="detail-chart-container">
+                        <canvas id="detail-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Detailed Table List -->
+                <div class="table-wrapper">
+                    <table class="table">
+                        <thead class="thead">
+                            <tr>
+                                <th scope="col" class="th">No</th>
+                                <th scope="col" class="th">Suhu (°C)</th>
+                                <th scope="col" class="th">Waktu Diterima</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-tbody">
+                            <!-- Rows rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    
+    <!-- App Logic -->
+    <script src="js/history.js"></script>
+</body>
+</html>

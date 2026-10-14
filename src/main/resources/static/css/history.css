@@ -1,0 +1,336 @@
+/* Sensor Cards for History */
+.gradient-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 10px 25px -10px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-card:hover {
+  background: var(--gradient-card-hover);
+  border-color: rgba(14, 165, 233, 0.3);
+  box-shadow: 0 15px 35px -10px var(--shadow-color), 0 0 25px -5px var(--shadow-glow-color);
+}
+
+/* Kartu berupa tombol agar bisa dipilih dengan mouse maupun keyboard. */
+.history-sensor {
+  text-align: left;
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  gap: 16px;
+  overflow-wrap: anywhere;
+}
+
+.history-sensor[aria-pressed="true"],
+.history-sensor:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
+/* Beri jarak antara pesan status dan daftar sensor. */
+#history-info {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+/* History Page layout */
+.history-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 768px) {
+  .history-header {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+}
+
+.hero-title {
+  margin-top: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.hero-desc {
+  margin-top: 12px;
+  max-width: 576px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .search-wrapper {
+    width: 320px;
+  }
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  color: var(--text-muted);
+}
+
+.search-input {
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 14px;
+  border-radius: 16px;
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+/* History Grid card special additions */
+.cursor-pointer { cursor: pointer; }
+.gradient-card.cursor-pointer {
+  height: 192px;
+  justify-content: space-between;
+}
+.group { position: relative; }
+
+.arrow-icon {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+
+.gradient-card:hover .arrow-icon {
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.card-header-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 16px;
+  background-color: rgba(14, 165, 233, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.card-meta-text {
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-meta-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.card-meta-unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.card-meta-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.card-meta-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* Online Badge */
+.status-pill {
+  display: flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+}
+
+.status-pill.online {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.status-pill.offline {
+  color: #94a3b8;
+  background-color: rgba(148, 163, 184, 0.1);
+}
+
+.status-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-pill.online .status-pill-dot {
+  background-color: #10b981;
+}
+
+.status-pill.offline .status-pill-dot {
+  background-color: #94a3b8;
+}
+
+/* Detail Section Table styles */
+.detail-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(148, 163, 184, 0.05);
+}
+
+.detail-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 24px;
+}
+
+@media (min-width: 1024px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.detail-chart-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  background-color: rgba(148, 163, 184, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.detail-chart-title h3 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.detail-chart-title p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.detail-chart-container {
+  height: 256px;
+  position: relative;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  background: var(--card-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.thead {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  background-color: rgba(148, 163, 184, 0.05);
+  font-family: 'Space Grotesk', sans-serif;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.th {
+  padding: 16px 24px;
+}
+
+.td {
+  padding: 16px 24px;
+}
+
+.tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.tr:hover {
+  background-color: rgba(148, 163, 184, 0.05);
+}
+
