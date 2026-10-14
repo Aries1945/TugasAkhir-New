@@ -1,9 +1,9 @@
 package com.example.TugasAkhir.mqtt;
 
-import com.example.TugasAkhir.service.SuhuService;
-import com.example.TugasAkhir.service.PesanErrorMqtt;
+import com.example.TugasAkhir.service.SensorDataService;
 
 import java.nio.charset.StandardCharsets;
+import jakarta.annotation.PreDestroy;
 
 import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
@@ -16,7 +16,7 @@ public class MqttClientManager {
 
  
     private volatile MqttClient client; // koneksi ke broker MQTT
-    private final SuhuService dataSuhu; // tempat simpan data suhu
+    private final SensorDataService dataSuhu; // tempat simpan data suhu
     private String topicAktif = "";
     private int qosAktif = 0;
     private MqttCallbackHandler statusMqtt;
@@ -39,7 +39,7 @@ public class MqttClientManager {
         return new StatusSubscription(connected, subscribed, topicAktif, qosAktif, reconnecting, pesan);
     }
 
-    public MqttClientManager(SuhuService dataSuhu) {
+    public MqttClientManager(SensorDataService dataSuhu) {
         this.dataSuhu = dataSuhu;
     }
 
@@ -61,18 +61,25 @@ public class MqttClientManager {
 
         String brokerUrl = protocol + host + ":" + port;
 
-        client = new MqttClient(brokerUrl, clientId, new MemoryPersistence());
+       MemoryPersistence persistence = new MemoryPersistence();
+
+        client = new MqttClient(brokerUrl, clientId, persistence);
 
         options = new MqttConnectionOptions();
-        // Berikan tempat penyimpanan suhu kepada callback.
-        statusMqtt = new MqttCallbackHandler(dataSuhu);
-        // Minta Paho memanggil callback ketika pesan atau kejadian koneksi diterima.
-        client.setCallback(statusMqtt);
+       
 
+        //konfigurasi koneksi dengan MQTTv5
         options.setConnectionTimeout(10);
         options.setCleanStart(true);
         options.setKeepAliveInterval(60);
         options.setAutomaticReconnect(true);
+
+
+
+         // Berikan tempat penyimpanan suhu kepada callback.
+        statusMqtt = new MqttCallbackHandler(dataSuhu);
+        // Minta Paho memanggil callback ketika pesan atau kejadian koneksi diterima.
+        client.setCallback(statusMqtt);
 
         // username bersifat opsional
         if (username != null && !username.isEmpty()) {
@@ -100,6 +107,9 @@ public class MqttClientManager {
 
     }
 
+    // Spring memanggil method ini sebelum aplikasi berhenti atau restart.
+    // Client Paho lama harus ditutup agar tidak tertinggal di background.
+    @PreDestroy
     public synchronized void putusKoneksi() throws MqttException {
 
         if (client == null) { // jika belom ada client maka null
@@ -168,7 +178,8 @@ public class MqttClientManager {
         var hasil = client.subscribe(topic, qos);
         int qosDiberikan = hasil.getGrantedQos()[0];
         if (qosDiberikan < 0 || qosDiberikan > 2) {
-            throw new IllegalArgumentException("Broker menolak subscription. " + PesanErrorMqtt.dariKode(qosDiberikan));
+            // Gunakan kode penolakan dari broker; Paho menyediakan pesan exception-nya.
+            throw new MqttException(qosDiberikan);
         }
         topicAktif = topic;
         qosAktif = qosDiberikan;

@@ -12,7 +12,7 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 public class publisher {
 
     public static void main(String[] args) {
-        String broker = "tcp://broker.emqx.io:1883";
+        String broker = "tcp://broker.hivemq.com:1883";
         String clientId = "publisher-sensor";
 
         // Lokasi file data sensor
@@ -55,8 +55,8 @@ public class publisher {
 
                     System.out.println("Data Terkirim -> Topik: " + topik + " | Suhu: " + suhu + " °C");
 
-                    // Jeda 1 detik antar pengiriman data
-                    Thread.sleep(1000);
+                    // Tunggu 2 detik sebelum mengirim baris data berikutnya.
+                    Thread.sleep(2000);
                 }
             }
 

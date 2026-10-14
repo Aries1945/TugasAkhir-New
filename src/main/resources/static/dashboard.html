@@ -60,8 +60,8 @@
         <div class="glass mb-8">
             <div class="stream-header">
                 <div class="stream-title">
-                    <h2>Live Stream</h2>
-                    <p>Suhu per topic · seluruh data tersimpan · waktu diterima server</p>
+                    <h2>Grafik suhu</h2>
+                    <p>Seluruh pembacaan sejak koneksi dimulai · waktu diterima server</p>
                 </div>
                 <span class="interval-badge">Jeda pembaruan: 250 ms</span>
             </div>
@@ -78,21 +78,22 @@
     <!-- Bentuk kartu ditulis di HTML; JavaScript hanya menyalin dan mengisinya. -->
     <template id="sensor-template">
         <article class="gradient-card">
+            <!-- Kartu sederhana: topic, suhu, grafik kecil, dan waktu terakhir. -->
             <div class="card-header"><h2 class="card-title"></h2></div>
-            <div class="gauge-container">
+            <div class="gauge-container" title="Skala indikator 0–50 °C">
                 <svg class="gauge-svg" viewBox="0 0 110 110" aria-hidden="true">
                     <path class="gauge-track-path" d="M 26.7 83.3 A 40 40 0 1 1 83.3 83.3" />
                     <path class="gauge-value-path" d="M 26.7 83.3 A 40 40 0 1 1 83.3 83.3" />
                 </svg>
                 <div class="gauge-center-text"><span class="gauge-value">—</span><span class="gauge-unit">°C</span></div>
             </div>
-            <p class="gauge-scale">Skala indikator 0–50 °C</p>
             <div class="sparkline-box">
                 <svg viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
                     <polyline class="sparkline" fill="none" stroke-width="1.5" />
                 </svg>
             </div>
-            <div class="card-footer"><span class="sensor-freshness"></span><time class="sensor-time"></time></div>
+            <div class="card-footer"><span class="sensor-freshness"></span><time class="sensor-time" title="Waktu data terakhir"></time></div>
+            <div class="card-glow" aria-hidden="true"></div>
         </article>
     </template>
 

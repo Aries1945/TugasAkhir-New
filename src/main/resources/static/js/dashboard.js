@@ -3,6 +3,13 @@ const tempatKartu = document.getElementById("sensor-cards-container");
 const templateSensor = document.getElementById("sensor-template");
 const warnaSensor = ["#0284c7", "#10b981", "#f59e0b", "#8b5cf6", "#e11d48"];
 let grafik = null;
+// Simpan kartu berdasarkan topic agar tidak dibuat ulang setiap pembaruan.
+const kartuSensor = new Map();
+
+// Tampilkan satu angka desimal agar suhu mudah dibaca.
+function formatSuhu(suhu) {
+    return suhu.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
 
 function formatWaktu(waktu) {
     return new Date(waktu).toLocaleTimeString("id-ID", { hour12: false });
@@ -46,36 +53,42 @@ if (typeof Chart !== "undefined") {
 
 // 2. Isi kartu berdasarkan pembacaan terbaru milik satu sensor.
 function tampilkanKartu(sensor, warna, waktuServer, terhubung) {
-    const salinan = templateSensor.content.cloneNode(true);
     const terakhir = sensor.pembacaan[sensor.pembacaan.length - 1];
-    const kartu = salinan.querySelector("article");
+    // Buat kartu hanya saat topic ini pertama kali diterima.
+    let kartu = kartuSensor.get(sensor.topic);
+    if (!kartu) {
+        kartu = templateSensor.content.querySelector("article").cloneNode(true);
+        kartuSensor.set(sensor.topic, kartu);
+        tempatKartu.append(kartu);
+    }
     kartu.style.setProperty("--sensor-color", warna);
-    salinan.querySelector(".card-title").textContent = sensor.topic;
-    salinan.querySelector(".gauge-value").textContent = terakhir.suhu.toLocaleString("id-ID", {
-        minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
-    salinan.querySelector(".sensor-time").textContent = formatWaktu(terakhir.waktu);
-    salinan.querySelector(".sensor-time").dateTime = new Date(terakhir.waktu).toISOString();
+    kartu.querySelector(".card-title").textContent = sensor.topic;
+    kartu.querySelector(".gauge-value").textContent = formatSuhu(terakhir.suhu);
+    kartu.querySelector(".sensor-time").textContent = formatWaktu(terakhir.waktu);
+    kartu.querySelector(".sensor-time").dateTime = new Date(terakhir.waktu).toISOString();
 
-    let status = "Data baru";
+    // Tampilkan peringatan hanya jika data terlambat atau broker terputus.
+    let status = "";
     if (!terhubung) status = "Broker terputus";
     else if (waktuServer - terakhir.waktu > 10000) status = "Belum ada data baru";
-    salinan.querySelector(".sensor-freshness").textContent = status;
+    kartu.querySelector(".sensor-freshness").textContent = status;
 
     // Lingkaran memakai skala 0–50 °C. Angka tetap menampilkan suhu sebenarnya.
     const persentase = Math.max(0, Math.min(1, terakhir.suhu / 50));
-    salinan.querySelector(".gauge-value-path").style.strokeDashoffset = 188.5 * (1 - persentase);
+    kartu.querySelector(".gauge-value-path").style.strokeDashoffset = 188.5 * (1 - persentase);
 
     // Grafik kecil memakai seluruh pembacaan yang masih tersimpan.
     const titik = sensor.pembacaan;
+    // Cari suhu minimum dan maksimum dari seluruh pembacaan sensor ini.
+    let minimum = titik[0].suhu;
+    let maksimum = titik[0].suhu;
+    for (const data of titik) {
+        minimum = Math.min(minimum, data.suhu);
+        maksimum = Math.max(maksimum, data.suhu);
+    }
+    kartu.querySelector(".sparkline").setAttribute("points", "");
     if (titik.length > 1) {
-        // Cari suhu terkecil dan terbesar tanpa membatasi jumlah pembacaan.
-        let minimum = titik[0].suhu;
-        let maksimum = titik[0].suhu;
-        for (const data of titik) {
-            minimum = Math.min(minimum, data.suhu);
-            maksimum = Math.max(maksimum, data.suhu);
-        }
+        // Beri ruang di atas dan bawah grafik kecil agar garis mudah dilihat.
         minimum -= 0.5;
         maksimum += 0.5;
         // Lebar grafik mengikuti waktu catatan pertama sampai terakhir.
@@ -87,15 +100,13 @@ function tampilkanKartu(sensor, warna, waktuServer, terhubung) {
             var y = 36 - (data.suhu - minimum) / (maksimum - minimum) * 32;
             return x + "," + y;
         });
-        salinan.querySelector(".sparkline").setAttribute("points", koordinat.join(" "));
+        kartu.querySelector(".sparkline").setAttribute("points", koordinat.join(" "));
     }
-    tempatKartu.append(salinan);
 }
 
 // =====================================================================
 // 3. RENDER DATA KE DASHBOARD
 //    Fungsi ini dipanggil setelah data REST API diterima.
-//    Isinya sama persis seperti sebelumnya, hanya dipindah ke fungsi sendiri.
 // =====================================================================
 function perbaruiTampilan(data) {
     document.getElementById("mqtt-status").textContent = data.connected ? "Connected" : "Disconnected";
@@ -106,10 +117,18 @@ function perbaruiTampilan(data) {
         ? "Terhubung ke broker · " + data.sensor.length + " sensor diterima"
         : data.message + (data.connected ? " Buka Configure untuk mengatur subscription." : "");
 
-    tempatKartu.replaceChildren();
+    // Hapus kartu yang sudah tidak ada, misalnya setelah koneksi baru dimulai.
+    for (const [topic, kartu] of kartuSensor) {
+        if (!data.sensor.some(sensor => sensor.topic === topic && sensor.pembacaan.length > 0)) {
+            kartu.remove();
+            kartuSensor.delete(topic);
+        }
+    }
     const garisSensor = [];
     let nomor = 0;
     for (const sensor of data.sensor) {
+        // Sensor tanpa pembacaan belum mempunyai angka yang bisa ditampilkan.
+        if (sensor.pembacaan.length === 0) continue;
         const warna = warnaSensor[nomor % warnaSensor.length];
         tampilkanKartu(sensor, warna, data.waktuServer, data.connected);
         const titikGrafik = [];

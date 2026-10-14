@@ -1,9 +1,10 @@
 package com.example.TugasAkhir.mqtt;
 
-import com.example.TugasAkhir.service.SuhuService;
-import com.example.TugasAkhir.service.PesanErrorMqtt;
+import com.example.TugasAkhir.service.SensorDataService;
+import com.example.TugasAkhir.model.SensorData;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttCallback;
 import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
@@ -14,10 +15,10 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 // Satu objek untuk satu client. Paho memanggil callback ini secara otomatis.
 public class MqttCallbackHandler implements MqttCallback {
     // Tempat menyimpan suhu agar bisa dibaca dashboard melalui REST API.
-    private final SuhuService dataSuhu;
+    private final SensorDataService dataSuhu;
 
     // Gunakan tempat penyimpanan yang sama dengan MqttClientManager.
-    public MqttCallbackHandler(SuhuService dataSuhu) {
+    public MqttCallbackHandler(SensorDataService dataSuhu) {
         this.dataSuhu = dataSuhu;
     }
 
@@ -32,7 +33,7 @@ public class MqttCallbackHandler implements MqttCallback {
     public synchronized String ambilPesan() {
         return pesan;
     }
-
+    //untuk mencegah hasil subscribe dari koneksi lama supaya tidak dianggap masih berlaku saat koneksi terhapus
     public synchronized int ambilNomorKoneksi() {
         return nomorKoneksi;
     }
@@ -54,10 +55,17 @@ public class MqttCallbackHandler implements MqttCallback {
     public synchronized void disconnected(MqttDisconnectResponse response) {
         nomorKoneksi++;
         subscribed = false;
+        // Jaringan putus: gunakan kode dan pesan exception asli Paho.
         if (response.getException() != null) {
-            pesan = PesanErrorMqtt.dariException(response.getException());
+            MqttException error = response.getException();
+            pesan = "Reason code: " + error.getReasonCode() + ". Detail Paho: " + error.toString();
         } else {
-            pesan = PesanErrorMqtt.dariKode(response.getReturnCode());
+            // Broker mengirim DISCONNECT: tampilkan reason string jika disertakan.
+            pesan = "Reason code: " + response.getReturnCode();
+            String alasan = response.getReasonString();
+            if (alasan != null && !alasan.isBlank()) {
+                pesan += ". Reason string: " + alasan;
+            }
         }
         pesan += " Paho akan mencoba menghubungkan kembali.";
     }
@@ -71,7 +79,8 @@ public class MqttCallbackHandler implements MqttCallback {
 
     @Override
     public synchronized void mqttErrorOccurred(MqttException error) {
-        pesan = PesanErrorMqtt.dariException(error);
+        // Pesan diambil dari Paho, tanpa tabel terjemahan kode buatan aplikasi.
+        pesan = "Reason code: " + error.getReasonCode() + ". Detail Paho: " + error.toString();
     }
 
     @Override
@@ -89,7 +98,8 @@ public class MqttCallbackHandler implements MqttCallback {
             }
 
             // 4. Simpan suhu beserta topic sensor. Dashboard mengambilnya lewat REST API.
-            dataSuhu.simpan(topic, suhu);
+            SensorData data = new SensorData(suhu, topic, LocalDateTime.now());
+            dataSuhu.processData(data);
             System.out.println("Topic: " + topic + " | Suhu: " + suhu + " °C");
         } catch (NumberFormatException error) {
             // Jika pesan bukan angka, abaikan pesan itu dan tetap terima pesan berikutnya.

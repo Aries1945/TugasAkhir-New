@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.TugasAkhir.service.PesanErrorMqtt;
+
 import com.example.TugasAkhir.mqtt.MqttClientManager;
 
 @RestController
@@ -36,7 +36,7 @@ public class mqttController {
             @RequestParam("tls") boolean tls) {
 
         try {
-            // Periksa input juga di Java sebelum menghubungi broker.
+            // Error isian belum melibatkan broker, sehingga tidak punya reason code MQTT.
             if (host.isBlank()) {
                 return ResponseEntity.badRequest().body("Host broker harus diisi.");
             }
@@ -46,7 +46,7 @@ public class mqttController {
             if (clientId.isBlank()) {
                 return ResponseEntity.badRequest().body("Client ID harus diisi dan tidak boleh hanya spasi.");
             }
-            host = host.trim();
+            host = host.trim(); // menghapus spasi depan belakang
             // Java memeriksa format alamat sebelum alamat diberikan ke Paho.
             URI alamat = new URI("tcp://" + host + ":" + port);
             if (alamat.getHost() == null) {
@@ -78,8 +78,8 @@ public class mqttController {
                     "Berhasil terhubung ke broker");
 
         } catch (MqttException error) {
-            // Paho memberi tahu connect gagal. Kirim penjelasannya ke halaman web.
-            return ResponseEntity.status(502).body("Gagal connect. " + PesanErrorMqtt.dariException(error));
+            // toString() Paho menyertakan penyebab asli, termasuk saat reason code bernilai 0.
+            return ResponseEntity.status(502).body("Gagal connect. " + "Reason code: " + error.getReasonCode() + ". Detail Paho: " + error.toString());
         } catch (IllegalArgumentException error) {
             return ResponseEntity.badRequest().body(error.getMessage());
         } catch (URISyntaxException error) {
@@ -97,9 +97,9 @@ public class mqttController {
             return ResponseEntity.ok("Koneksi berhasil diputus");
 
         } catch (MqttException error) {
-            // Paho memberi tahu disconnect gagal. Tampilkan pesan untuk pengguna.
+            // Error saat meminta disconnect memiliki reason code dan pesan dari Paho.
             return ResponseEntity.status(500).body(
-                    "Gagal disconnect. " + PesanErrorMqtt.dariException(error));
+                    "Gagal disconnect. " + "Reason code: " + error.getReasonCode() + ". Detail Paho: " + error.toString());
         }
     }
 

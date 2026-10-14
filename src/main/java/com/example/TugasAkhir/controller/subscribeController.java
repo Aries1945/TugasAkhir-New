@@ -1,7 +1,7 @@
 package com.example.TugasAkhir.controller;
 
 import com.example.TugasAkhir.mqtt.MqttClientManager;
-import com.example.TugasAkhir.service.PesanErrorMqtt;
+
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +46,7 @@ public class subscribeController {
         } catch (MqttException error) {
             // Tangkap kegagalan subscribe yang dilaporkan library Paho.
             return ResponseEntity.status(502).body(
-                    "Gagal subscribe. " + PesanErrorMqtt.dariException(error)
+                    "Gagal subscribe. " + "Reason code: " + error.getReasonCode() + ". Detail Paho: " + error.toString()
             );
         }
     }
@@ -62,7 +62,7 @@ public class subscribeController {
             return ResponseEntity.badRequest().body(error.getMessage());
         } catch (MqttException error) {
             // Tangkap kegagalan unsubscribe yang dilaporkan library Paho.
-            return ResponseEntity.status(502).body("Gagal unsubscribe. " + PesanErrorMqtt.dariException(error));
+            return ResponseEntity.status(502).body("Gagal unsubscribe. " + "Reason code: " + error.getReasonCode() + ". Detail Paho: " + error.toString());
         }
     }
 }
