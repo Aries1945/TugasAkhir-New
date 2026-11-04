@@ -7,13 +7,16 @@ import java.io.File;
 import java.util.Scanner;
 
 import org.eclipse.paho.mqttv5.client.MqttClient;
+import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
+import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 
 public class publisher {
 
     public static void main(String[] args) {
-        String broker = "tcp://broker.hivemq.com:1883";
-        String clientId = "publisher-sensor";
+        String broker = "tcp://broker.emqx.io:1883";
+        // Client ID harus unik: broker memutus koneksi lama jika ada ID yang sama.
+        String clientId = "publisher-sensor-" + System.currentTimeMillis();
 
         // Lokasi file data sensor
         File file = new File("sensing_1779624099815.txt");
@@ -28,8 +31,12 @@ public class publisher {
 
         try {
             // 1. Buat koneksi ke broker MQTT
-            MqttClient client = new MqttClient(broker, clientId);
-            client.connect();
+            MqttClient client = new MqttClient(broker, clientId, new MemoryPersistence());
+            MqttConnectionOptions opsi = new MqttConnectionOptions();
+            // Sambungkan ulang otomatis jika koneksi ke broker sempat terputus.
+            opsi.setAutomaticReconnect(true);
+            opsi.setCleanStart(true);
+            client.connect(opsi);
             System.out.println("Berhasil terhubung ke broker MQTT!");
 
             // 2. Baca file teks baris demi baris menggunakan Scanner
@@ -51,6 +58,11 @@ public class publisher {
                     // 3. Kirim data langsung sebagai byte array ke broker MQTT
                     MqttMessage pesan = new MqttMessage(suhu.getBytes());
                     pesan.setQos(1);
+                    // Tunggu sampai tersambung kembali sebelum mengirim.
+                    while (!client.isConnected()) {
+                        System.out.println("Koneksi terputus, menunggu sambung ulang...");
+                        Thread.sleep(1000);
+                    }
                     client.publish(topik, pesan);
 
                     System.out.println("Data Terkirim -> Topik: " + topik + " | Suhu: " + suhu + " °C");

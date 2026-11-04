@@ -23,6 +23,8 @@ function periksaInput() {
     const port = document.getElementById("port").value;
     const clientId = document.getElementById("clientId").value;
     const tls = document.getElementById("tls").value;
+    const connectionTimeout = document.getElementById("connectionTimeout").value;
+    const keepAliveInterval = document.getElementById("keepAliveInterval").value;
 
     if (host === "") {
         alert("Host broker harus diisi.");
@@ -68,7 +70,17 @@ function periksaInput() {
     }
 
     if (tls === "") {
-        alert("Pilih Tanpa TLS atau Gunakan TLS/SSL.");
+        alert("Pilih protocol.");
+        return false;
+    }
+
+    if (!Number.isInteger(Number(connectionTimeout)) || Number(connectionTimeout) < 1) {
+        alert("Connection timeout harus berupa angka bulat minimal 1 detik.");
+        return false;
+    }
+
+    if (keepAliveInterval === "" || !Number.isInteger(Number(keepAliveInterval)) || Number(keepAliveInterval) < 0 || Number(keepAliveInterval) > 65535) {
+        alert("Keep alive interval harus berupa angka bulat antara 0 dan 65535 detik.");
         return false;
     }
 
@@ -91,7 +103,10 @@ async function bacaPesan(jawaban) {
 async function ConnectBroker() {
     if (!periksaInput()) return;
     const konfigurasi = {};
-    for (const nama of ["host", "port", "clientId", "username", "tls"]) {
+    for (const nama of [
+        "host", "port", "clientId", "username", "tls", "connectionTimeout",
+        "cleanStart", "keepAliveInterval", "automaticReconnect"
+    ]) {
         konfigurasi[nama] = document.getElementById(nama).value;
     }
     konfigurasi.host = konfigurasi.host.trim();
@@ -139,8 +154,11 @@ async function cekStatusKoneksi() {
         const konfigurasi = sessionStorage.getItem("konfigurasiBroker");
         if (konfigurasi) {
             const data = JSON.parse(konfigurasi);
-            for (const nama of ["host", "port", "clientId", "username", "tls"]) {
-                document.getElementById(nama).value = data[nama] ?? "";
+            for (const nama of [
+                "host", "port", "clientId", "username", "tls", "connectionTimeout",
+                "cleanStart", "keepAliveInterval", "automaticReconnect"
+            ]) {
+                if (data[nama] !== undefined) document.getElementById(nama).value = data[nama];
             }
         }
     } catch (error) {
