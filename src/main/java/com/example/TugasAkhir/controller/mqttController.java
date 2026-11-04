@@ -33,7 +33,11 @@ public class mqttController {
             @RequestParam("clientId") String clientId,
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "password", required = false) String password,
-            @RequestParam("tls") boolean tls) {
+            @RequestParam("tls") boolean tls,
+            @RequestParam("connectionTimeout") int connectionTimeout,
+            @RequestParam("cleanStart") boolean cleanStart,
+            @RequestParam("keepAliveInterval") int keepAliveInterval,
+            @RequestParam("automaticReconnect") boolean automaticReconnect) {
 
         try {
             // Error isian belum melibatkan broker, sehingga tidak punya reason code MQTT.
@@ -45,6 +49,12 @@ public class mqttController {
             }
             if (clientId.isBlank()) {
                 return ResponseEntity.badRequest().body("Client ID harus diisi dan tidak boleh hanya spasi.");
+            }
+            if (connectionTimeout < 1) {
+                return ResponseEntity.badRequest().body("Connection timeout harus minimal 1 detik.");
+            }
+            if (keepAliveInterval < 0 || keepAliveInterval > 65535) {
+                return ResponseEntity.badRequest().body("Keep alive interval harus antara 0 dan 65535 detik.");
             }
             host = host.trim(); // menghapus spasi depan belakang
             // Java memeriksa format alamat sebelum alamat diberikan ke Paho.
@@ -71,7 +81,11 @@ public class mqttController {
                     clientId,
                     username,
                     password,
-                    tls);
+                    tls,
+                    connectionTimeout,
+                    cleanStart,
+                    keepAliveInterval,
+                    automaticReconnect);
 
             // Kirim jawaban berhasil ke JavaScript.
             return ResponseEntity.ok(

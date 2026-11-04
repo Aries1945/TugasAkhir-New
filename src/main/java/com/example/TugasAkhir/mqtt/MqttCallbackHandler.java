@@ -104,6 +104,12 @@ public class MqttCallbackHandler implements MqttCallback {
         } catch (NumberFormatException error) {
             // Jika pesan bukan angka, abaikan pesan itu dan tetap terima pesan berikutnya.
             System.out.println("Payload bukan angka suhu pada topic: " + topic);
+        } catch (Exception error) {
+            // Jika ada error lain (misalnya database gagal menyimpan),
+            // cukup tampilkan errornya di terminal.
+            // Kalau error ini tidak ditangkap, Paho akan memutus koneksi MQTT
+            // dan dashboard berhenti menerima data.
+            System.out.println("Gagal menyimpan data dari topic " + topic + ": " + error.getMessage());
         }
     }
 

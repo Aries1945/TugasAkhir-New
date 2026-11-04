@@ -31,7 +31,8 @@
 @media (min-width: 1024px) {
   .sidebar-hero {
     position: sticky;
-    top: 110px; /* Offset below sticky nav */
+    top: 110px;
+    /* Offset below sticky nav */
     max-height: calc(100vh - 150px);
   }
 }
@@ -146,16 +147,19 @@
   color: #10b981;
   border-color: rgba(16, 185, 129, 0.2);
 }
+
 .card-badge.status-cold {
   background-color: rgba(14, 165, 233, 0.1);
   color: #0ea5e9;
   border-color: rgba(14, 165, 233, 0.2);
 }
+
 .card-badge.status-warm {
   background-color: rgba(245, 158, 11, 0.1);
   color: #f59e0b;
   border-color: rgba(245, 158, 11, 0.2);
 }
+
 .card-badge.status-hot {
   background-color: rgba(239, 68, 68, 0.1);
   color: #ef4444;
@@ -190,7 +194,8 @@
   stroke-width: 8;
   stroke-linecap: round;
   fill: none;
-  stroke-dasharray: 188.5; /* 3/4 circle perimeter with R=40 */
+  stroke-dasharray: 188.5;
+  /* 3/4 circle perimeter with R=40 */
   stroke-dashoffset: 188.5;
   /* Gerakan indikator singkat dan halus, mengikuti pembaruan data. */
   transition: stroke-dashoffset 0.2s ease;
@@ -334,43 +339,212 @@
 }
 
 
-.dashboard-intro { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
-.dashboard-intro h1 { font-size: 24px; margin: 4px 0 8px; }
-.dashboard-eyebrow { color: #0284c7; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
-#dashboard-info, #chart-info { font-size: 12px; color: var(--text-muted); }
-.configure-link { padding: 10px 16px; background: #e0f2fe; border-radius: 10px; color: #0369a1; font-size: 12px; white-space: nowrap; }
-.empty-state { margin-bottom: 24px; padding: 32px; text-align: center; font-size: 14px; }
-#sensor-cards-container { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.card-title { overflow-wrap: anywhere; }
-.gauge-value { color: var(--sensor-color); }
-.gauge-value-path, .sparkline { stroke: var(--sensor-color); }
-.gauge-scale { text-align: center; font-size: 9px; color: var(--text-muted); margin-bottom: 12px; }
-.sparkline-box svg { width: 100%; height: 40px; }
-.card-footer { gap: 12px; }
-#chart-info { margin-top: 12px; }
-@media (max-width: 600px) { .dashboard-intro { align-items: flex-start; flex-direction: column; } }
+.dashboard-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.dashboard-intro h1 {
+  font-size: 24px;
+  margin: 4px 0 8px;
+}
+
+.dashboard-eyebrow {
+  color: #0284c7;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+#dashboard-info,
+#chart-info {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.configure-link {
+  padding: 10px 16px;
+  background: #e0f2fe;
+  border-radius: 10px;
+  color: #0369a1;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.empty-state {
+  margin-bottom: 24px;
+  padding: 32px;
+  text-align: center;
+  font-size: 14px;
+}
+
+#sensor-cards-container {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Satu kartu = satu bahan perbandingan suhu. */
+.analysis-card {
+  min-height: 330px;
+  gap: 16px;
+}
+
+.card-label {
+  margin-bottom: 4px;
+  color: var(--sensor-color);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+
+.latest-temperature {
+  color: var(--sensor-color);
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.latest-temperature .gauge-value { font-size: 24px; }
+
+.range-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.range-summary div { min-width: 0; }
+.range-summary span, .range-summary small { display: block; color: var(--text-muted); font-size: 9px; }
+.range-summary strong { display: inline-block; margin: 3px 2px 0 0; color: var(--text-primary); font-size: 15px; }
+
+.sensor-chart-box { height: 150px; position: relative; }
+.sensor-chart { width: 100% !important; height: 100% !important; }
+
+.card-title {
+  overflow-wrap: anywhere;
+}
+
+.gauge-value {
+  color: var(--sensor-color);
+}
+
+.gauge-value-path,
+.sparkline {
+  stroke: var(--sensor-color);
+}
+
+.gauge-scale {
+  text-align: center;
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.sparkline-box svg {
+  width: 100%;
+  height: 40px;
+}
+
+.card-footer {
+  gap: 12px;
+}
+
+#chart-info {
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .dashboard-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
 
 
 /* Kartu mengikuti TA-tes: gauge di tengah, sparkline, dan cahaya lembut. */
-#sensor-cards-container { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.gradient-card { min-height: 256px; }
-.gradient-card .gauge-value { font-size: 28px; }
-.gradient-card .sparkline-box { height: 40px; margin-top: auto; }
-.gradient-card .card-glow { background: var(--sensor-color); }
-.sensor-pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: -6px 0 24px; font-size: 12px; color: var(--text-muted); }
-.sensor-pagination[hidden] { display: none; }
-.sensor-pagination button { border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; background: white; color: #0284c7; cursor: pointer; }
-.sensor-pagination button:disabled { opacity: .4; cursor: not-allowed; }
-#chart-error { color: #b91c1c; font-size: 12px; }
-@media (max-width: 900px) { #sensor-cards-container { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 580px) { #sensor-cards-container { grid-template-columns: 1fr; } .status-badge { flex-wrap: wrap; } }
+#sensor-cards-container {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.gradient-card {
+  min-height: 256px;
+}
+
+.gradient-card .gauge-value {
+  font-size: 28px;
+}
+
+.gradient-card .sparkline-box {
+  height: 40px;
+  margin-top: auto;
+}
+
+.gradient-card .card-glow {
+  background: var(--sensor-color);
+}
+
+.sensor-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: -6px 0 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sensor-pagination[hidden] {
+  display: none;
+}
+
+.sensor-pagination button {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: white;
+  color: #0284c7;
+  cursor: pointer;
+}
+
+.sensor-pagination button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+#chart-error {
+  color: #b91c1c;
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  #sensor-cards-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 580px) {
+  #sensor-cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .status-badge {
+    flex-wrap: wrap;
+  }
+}
 
 /* Tampilan sederhana sesuai contoh: topic kecil dan gauge di tengah. */
 .gradient-card {
   min-height: 256px;
   padding: 24px;
 }
-.gradient-card .card-title { font-size: 12px; }
+
+.gradient-card .card-title {
+  font-size: 12px;
+}
 
 /* Grafik kecil berada di kanan bawah, diikuti waktu data terakhir. */
 .gradient-card .sparkline-box {
@@ -379,11 +553,59 @@
   align-self: flex-end;
   margin-top: auto;
 }
-.gradient-card .sparkline-box svg { height: 32px; }
-.sensor-freshness { color: var(--text-muted); }
-.sensor-time { white-space: nowrap; }
+
+.gradient-card .sparkline-box svg {
+  height: 32px;
+}
+
+.sensor-freshness {
+  color: var(--text-muted);
+}
+
+.sensor-time {
+  white-space: nowrap;
+}
 
 /* Hormati pengguna yang memilih tampilan tanpa animasi. */
 @media (prefers-reduced-motion: reduce) {
-  .gauge-value-path { transition: none; }
+  .gauge-value-path {
+    transition: none;
+  }
 }
+
+/* Menang atas aturan kartu lama yang dipakai halaman dashboard sebelumnya. */
+.gradient-card.analysis-card {
+  min-height: 330px;
+}
+
+.analysis-card .latest-temperature .gauge-value {
+  font-size: 24px;
+}
+
+/* Kartu hanya berfungsi sebagai pemilih sensor; grafik berada di detail bawah. */
+.sensor-select-card {
+  min-height: 148px;
+  cursor: pointer;
+  justify-content: center;
+  gap: 12px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.sensor-select-card:hover,
+.sensor-select-card:focus-visible,
+.sensor-select-card.selected {
+  border-color: var(--sensor-color);
+  box-shadow: 0 10px 25px -10px var(--sensor-color);
+  outline: none;
+}
+
+.sensor-card-name-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sensor-card-name-row span { color: var(--sensor-color); font-size: 24px; }
+.sensor-card-temperature { color: var(--sensor-color); font-size: 14px; font-weight: 700; }
+.card-temperature-value { font-size: 28px; }
+.sensor-card-hint { color: var(--text-muted); font-size: 12px; }
+
+.sensor-detail { margin-bottom: 32px; }
+.sensor-detail[hidden] { display: none; }
+.detail-chart-container { height: 320px; }
+.close-detail { border: 1px solid var(--border-color); border-radius: 8px; background: white; color: var(--text-secondary); cursor: pointer; font-size: 12px; padding: 8px 12px; }

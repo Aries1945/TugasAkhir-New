@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
+
 <body>
 
     <!-- Top Navigation -->
@@ -21,7 +23,7 @@
                     <img src="assets/LogoIF2.png" alt="IF" class="nav-logo-img">
                 </div>
             </div>
-            
+
             <!-- Links -->
             <div class="nav-links ml-8">
                 <a href="dashboard.html" class="nav-link active">Dashboard</a>
@@ -29,7 +31,7 @@
                 <a href="settings.html" class="nav-link">Configure</a>
             </div>
         </div>
-        
+
         <div class="flex items-center space-x-3">
             <!-- Status Badge -->
             <div class="status-badge">
@@ -37,7 +39,7 @@
                 <span class="ws-status-text">MQTT</span>
                 <span class="mqtt-status-text" id="mqtt-status">Memuat...</span>
             </div>
-            
+
         </div>
     </nav>
 
@@ -50,57 +52,47 @@
             </div>
             <a href="settings.html" class="configure-link">Atur koneksi &amp; topic →</a>
         </section>
-        <p id="dashboard-empty" class="glass empty-state">Belum ada data suhu. Hubungkan broker, subscribe, lalu jalankan publisher.</p>
+        <p id="dashboard-empty" class="glass empty-state">Belum ada data suhu. Hubungkan broker, subscribe, lalu
+            jalankan publisher.</p>
         <!-- Sensor Cards Grid -->
         <div id="sensor-cards-container" class="grid grid-cols-1 md-grid-cols-3 gap-6 mb-6">
             <!-- Kartu diisi dari template HTML di bawah. -->
         </div>
 
-        <!-- Live Stream Chart -->
-        <div class="glass mb-8">
+        <section id="sensor-detail" class="glass sensor-detail" hidden aria-live="polite">
             <div class="stream-header">
                 <div class="stream-title">
-                    <h2>Grafik suhu</h2>
-                    <p>Seluruh pembacaan sejak koneksi dimulai · waktu diterima server</p>
+                    <p class="dashboard-eyebrow">DETAIL ANALISIS</p>
+                    <h2 id="detail-sensor-name">Sensor</h2>
+                    <p id="detail-range">Rentang suhu pembacaan sensor.</p>
                 </div>
-                <span class="interval-badge">Jeda pembaruan: 250 ms</span>
+                <button id="close-detail" class="close-detail" type="button">Tutup detail</button>
             </div>
-            
-            <div class="chart-container">
-                <canvas id="mainChart" role="img" aria-label="Grafik seluruh pembacaan suhu yang tersimpan"></canvas>
+            <div class="chart-container detail-chart-container">
+                <canvas id="detailChart" role="img" aria-label="Grafik suhu sensor terpilih"></canvas>
             </div>
-            
-            <!-- Custom Legend -->
-            <p id="chart-info" class="form-help" role="status"></p>
-        </div>
+        </section>
+
     </main>
 
     <!-- Bentuk kartu ditulis di HTML; JavaScript hanya menyalin dan mengisinya. -->
     <template id="sensor-template">
-        <article class="gradient-card">
-            <!-- Kartu sederhana: topic, suhu, grafik kecil, dan waktu terakhir. -->
-            <div class="card-header"><h2 class="card-title"></h2></div>
-            <div class="gauge-container" title="Skala indikator 0–50 °C">
-                <svg class="gauge-svg" viewBox="0 0 110 110" aria-hidden="true">
-                    <path class="gauge-track-path" d="M 26.7 83.3 A 40 40 0 1 1 83.3 83.3" />
-                    <path class="gauge-value-path" d="M 26.7 83.3 A 40 40 0 1 1 83.3 83.3" />
-                </svg>
-                <div class="gauge-center-text"><span class="gauge-value">—</span><span class="gauge-unit">°C</span></div>
+        <article class="gradient-card sensor-select-card" tabindex="0" role="button">
+            <p class="card-label">SENSOR SUHU</p>
+            <div class="sensor-card-name-row">
+                <h2 class="card-title"></h2>
+                <span aria-hidden="true">→</span>
             </div>
-            <div class="sparkline-box">
-                <svg viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
-                    <polyline class="sparkline" fill="none" stroke-width="1.5" />
-                </svg>
-            </div>
-            <div class="card-footer"><span class="sensor-freshness"></span><time class="sensor-time" title="Waktu data terakhir"></time></div>
-            <div class="card-glow" aria-hidden="true"></div>
+            <p class="sensor-card-temperature"><span class="card-temperature-value">—</span> <span>°C</span></p>
+            <p class="sensor-card-hint">Klik untuk melihat detail grafik</p>
         </article>
     </template>
 
     <!-- Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-    
+
     <!-- App Logic -->
     <script src="js/dashboard.js"></script>
 </body>
+
 </html>

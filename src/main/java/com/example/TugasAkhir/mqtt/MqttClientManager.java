@@ -44,7 +44,8 @@ public class MqttClientManager {
     }
 
     public synchronized void koneksi(String host, int port, String clientId, String username, String password,
-            boolean tls) throws MqttException {
+            boolean tls, int connectionTimeout, boolean cleanStart, int keepAliveInterval,
+            boolean automaticReconnect) throws MqttException {
 
         if (client != null) {
             throw new IllegalArgumentException("Client masih aktif. Disconnect terlebih dahulu.");
@@ -65,14 +66,7 @@ public class MqttClientManager {
 
         client = new MqttClient(brokerUrl, clientId, persistence);
 
-        options = new MqttConnectionOptions();
-       
-
-        //konfigurasi koneksi dengan MQTTv5
-        options.setConnectionTimeout(10);
-        options.setCleanStart(true);
-        options.setKeepAliveInterval(60);
-        options.setAutomaticReconnect(true);
+        options = buatOpsiKoneksi(connectionTimeout, cleanStart, keepAliveInterval, automaticReconnect);
 
 
 
@@ -105,6 +99,16 @@ public class MqttClientManager {
         }
         dataSuhu.bersihkan();
 
+    }
+
+    static MqttConnectionOptions buatOpsiKoneksi(int connectionTimeout, boolean cleanStart, int keepAliveInterval,
+            boolean automaticReconnect) {
+        MqttConnectionOptions opsi = new MqttConnectionOptions();
+        opsi.setConnectionTimeout(connectionTimeout);
+        opsi.setCleanStart(cleanStart);
+        opsi.setKeepAliveInterval(keepAliveInterval);
+        opsi.setAutomaticReconnect(automaticReconnect);
+        return opsi;
     }
 
     // Spring memanggil method ini sebelum aplikasi berhenti atau restart.
