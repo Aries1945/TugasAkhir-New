@@ -44,7 +44,7 @@ public class MqttClientManager {
     }
 
     public synchronized void koneksi(String host, int port, String clientId, String username, String password,
-            boolean tls, int connectionTimeout, boolean cleanStart, int keepAliveInterval,
+            String protocol, int connectionTimeout, boolean cleanStart, int keepAliveInterval,
             boolean automaticReconnect) throws MqttException {
 
         if (client != null) {
@@ -52,15 +52,9 @@ public class MqttClientManager {
         }
         topicAktif = "";
         qosAktif = 0;
-        String protocol;
-
-        if (tls) {
-            protocol = "ssl://";
-        } else {
-            protocol = "tcp://";
-        }
-
-        String brokerUrl = protocol + host + ":" + port;
+        // Contoh hasilnya: tcp://broker.emqx.io:1883 atau ws://localhost:8083.
+        // Nilai protocol sudah diperiksa oleh mqttController sebelum sampai ke sini.
+        String brokerUrl = protocol + "://" + host + ":" + port;
 
        MemoryPersistence persistence = new MemoryPersistence();
 

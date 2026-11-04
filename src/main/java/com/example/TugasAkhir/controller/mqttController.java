@@ -33,7 +33,7 @@ public class mqttController {
             @RequestParam("clientId") String clientId,
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "password", required = false) String password,
-            @RequestParam("tls") boolean tls,
+            @RequestParam("protocol") String protocol,
             @RequestParam("connectionTimeout") int connectionTimeout,
             @RequestParam("cleanStart") boolean cleanStart,
             @RequestParam("keepAliveInterval") int keepAliveInterval,
@@ -50,6 +50,10 @@ public class mqttController {
             if (clientId.isBlank()) {
                 return ResponseEntity.badRequest().body("Client ID harus diisi dan tidak boleh hanya spasi.");
             }
+            // Hanya tiga protocol MQTT yang ditampilkan pada halaman Configure.
+            if (!protocol.equals("tcp") && !protocol.equals("ssl") && !protocol.equals("ws")) {
+                return ResponseEntity.badRequest().body("Pilih protocol TCP, TLS, atau WebSocket.");
+            }
             if (connectionTimeout < 1) {
                 return ResponseEntity.badRequest().body("Connection timeout harus minimal 1 detik.");
             }
@@ -58,7 +62,7 @@ public class mqttController {
             }
             host = host.trim(); // menghapus spasi depan belakang
             // Java memeriksa format alamat sebelum alamat diberikan ke Paho.
-            URI alamat = new URI("tcp://" + host + ":" + port);
+            URI alamat = new URI(protocol + "://" + host + ":" + port);
             if (alamat.getHost() == null) {
                 return ResponseEntity.badRequest().body("Format nama broker atau IP tidak valid.");
             }
@@ -81,7 +85,7 @@ public class mqttController {
                     clientId,
                     username,
                     password,
-                    tls,
+                    protocol,
                     connectionTimeout,
                     cleanStart,
                     keepAliveInterval,
