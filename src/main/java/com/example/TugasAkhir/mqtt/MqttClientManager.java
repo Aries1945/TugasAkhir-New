@@ -65,7 +65,7 @@ public class MqttClientManager {
 
 
          // Berikan tempat penyimpanan suhu kepada callback.
-        statusMqtt = new MqttCallbackHandler(dataSuhu);
+        statusMqtt = new MqttCallbackHandler(dataSuhu, automaticReconnect);
         // Minta Paho memanggil callback ketika pesan atau kejadian koneksi diterima.
         client.setCallback(statusMqtt);
 

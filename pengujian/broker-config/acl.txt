@@ -1,0 +1,5 @@
+# Aturan untuk client tanpa username (anonim):
+# - sensor/suhu/#  : boleh membaca dan menulis
+# - rahasia/#      : hanya boleh MENULIS (publish), TIDAK boleh membaca (subscribe/menerima)
+topic readwrite sensor/suhu/#
+topic write rahasia/#

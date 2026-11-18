@@ -102,16 +102,24 @@ async function bacaPesan(jawaban) {
 
 async function ConnectBroker() {
     if (!periksaInput()) return;
-    const konfigurasi = {};
-    for (const nama of [
-        "host", "port", "clientId", "username", "protocol", "connectionTimeout",
-        "cleanStart", "keepAliveInterval", "automaticReconnect"
-    ]) {
-        konfigurasi[nama] = document.getElementById(nama).value;
-    }
-    konfigurasi.host = konfigurasi.host.trim();
+
+    // Ambil isi setiap field pada formulir satu per satu.
+    const konfigurasi = {
+        host: document.getElementById("host").value.trim(),
+        port: document.getElementById("port").value,
+        clientId: document.getElementById("clientId").value,
+        username: document.getElementById("username").value,
+        protocol: document.getElementById("protocol").value,
+        connectionTimeout: document.getElementById("connectionTimeout").value,
+        cleanStart: document.getElementById("cleanStart").value,
+        keepAliveInterval: document.getElementById("keepAliveInterval").value,
+        automaticReconnect: document.getElementById("automaticReconnect").value
+    };
+
+    // Password hanya dikirim ke server dan tidak disimpan di konfigurasi browser.
+    const password = document.getElementById("password").value;
     const data = new URLSearchParams(konfigurasi);
-    data.append("password", document.getElementById("password").value);
+    data.append("password", password);
     await ubahKoneksi("connect", data, konfigurasi);
 }
 
