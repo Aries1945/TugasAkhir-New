@@ -16,10 +16,12 @@ import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 public class MqttCallbackHandler implements MqttCallback {
     // Tempat menyimpan suhu agar bisa dibaca dashboard melalui REST API.
     private final SensorDataService dataSuhu;
+    private boolean automaticReconnect;
 
     // Gunakan tempat penyimpanan yang sama dengan MqttClientManager.
-    public MqttCallbackHandler(SensorDataService dataSuhu) {
+    public MqttCallbackHandler(SensorDataService dataSuhu, boolean automaticReconnect) {
         this.dataSuhu = dataSuhu;
+        this.automaticReconnect = automaticReconnect;
     }
 
     private boolean subscribed = false;
@@ -67,7 +69,12 @@ public class MqttCallbackHandler implements MqttCallback {
                 pesan += ". Reason string: " + alasan;
             }
         }
-        pesan += " Paho akan mencoba menghubungkan kembali.";
+
+        if (automaticReconnect) {
+            pesan += " Paho akan mencoba menghubungkan kembali.";
+        } else {
+            pesan += " Pilih Disconnect lalu Connect untuk menghubungkan kembali.";
+        }
     }
 
     @Override
@@ -96,7 +103,7 @@ public class MqttCallbackHandler implements MqttCallback {
             if (!Double.isFinite(suhu)) {
                 return;
             }
-
+            
             // 4. Simpan suhu beserta topic sensor. Dashboard mengambilnya lewat REST API.
             SensorData data = new SensorData(suhu, topic, LocalDateTime.now());
             dataSuhu.processData(data);

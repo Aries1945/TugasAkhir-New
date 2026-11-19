@@ -22,7 +22,7 @@ function periksaInput() {
     const host = document.getElementById("host").value.trim();
     const port = document.getElementById("port").value;
     const clientId = document.getElementById("clientId").value;
-    const tls = document.getElementById("tls").value;
+    const protocol = document.getElementById("protocol").value;
     const connectionTimeout = document.getElementById("connectionTimeout").value;
     const keepAliveInterval = document.getElementById("keepAliveInterval").value;
 
@@ -69,7 +69,7 @@ function periksaInput() {
         return false;
     }
 
-    if (tls === "") {
+    if (protocol === "") {
         alert("Pilih protocol.");
         return false;
     }
@@ -102,16 +102,24 @@ async function bacaPesan(jawaban) {
 
 async function ConnectBroker() {
     if (!periksaInput()) return;
-    const konfigurasi = {};
-    for (const nama of [
-        "host", "port", "clientId", "username", "tls", "connectionTimeout",
-        "cleanStart", "keepAliveInterval", "automaticReconnect"
-    ]) {
-        konfigurasi[nama] = document.getElementById(nama).value;
-    }
-    konfigurasi.host = konfigurasi.host.trim();
+
+    // Ambil isi setiap field pada formulir satu per satu.
+    const konfigurasi = {
+        host: document.getElementById("host").value.trim(),
+        port: document.getElementById("port").value,
+        clientId: document.getElementById("clientId").value,
+        username: document.getElementById("username").value,
+        protocol: document.getElementById("protocol").value,
+        connectionTimeout: document.getElementById("connectionTimeout").value,
+        cleanStart: document.getElementById("cleanStart").value,
+        keepAliveInterval: document.getElementById("keepAliveInterval").value,
+        automaticReconnect: document.getElementById("automaticReconnect").value
+    };
+
+    // Password hanya dikirim ke server dan tidak disimpan di konfigurasi browser.
+    const password = document.getElementById("password").value;
     const data = new URLSearchParams(konfigurasi);
-    data.append("password", document.getElementById("password").value);
+    data.append("password", password);
     await ubahKoneksi("connect", data, konfigurasi);
 }
 
@@ -155,10 +163,14 @@ async function cekStatusKoneksi() {
         if (konfigurasi) {
             const data = JSON.parse(konfigurasi);
             for (const nama of [
-                "host", "port", "clientId", "username", "tls", "connectionTimeout",
+                "host", "port", "clientId", "username", "protocol", "connectionTimeout",
                 "cleanStart", "keepAliveInterval", "automaticReconnect"
             ]) {
                 if (data[nama] !== undefined) document.getElementById(nama).value = data[nama];
+            }
+            // Konfigurasi lama memakai field "tls". Ubah ke pilihan baru secara otomatis.
+            if (data.protocol === undefined && data.tls !== undefined) {
+                document.getElementById("protocol").value = data.tls === "true" ? "ssl" : "tcp";
             }
         }
     } catch (error) {

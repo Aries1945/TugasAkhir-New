@@ -16,7 +16,7 @@ public class publisher {
     public static void main(String[] args) {
         String broker = "tcp://broker.emqx.io:1883";
         // Client ID harus unik: broker memutus koneksi lama jika ada ID yang sama.
-        String clientId = "publisher-sensor-" + System.currentTimeMillis();
+        String clientId = "uji-takeover-01" + System.currentTimeMillis();
 
         // Lokasi file data sensor
         File file = new File("sensing_1779624099815.txt");
